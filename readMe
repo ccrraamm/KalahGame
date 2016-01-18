@@ -1,0 +1,43 @@
+
+
+/* 
+ *
+ *                 Tema 2 - PARADIGME DE PROGRAMARE
+ *                          Haskell : Kalah
+ *                          Realizata de : Lavinia Tache
+ *                                          322CA
+ *
+ */
+ 
+    Obiectiv:
+        * utilizarea mecanismelor functionale si de tipuri ale limbajului Haskell pentru implementarea unui joc - Kalah
+
+	    Implementarea temei presupune definirea tipului board astfel incat sa
+	retina informatiile despre starea jocului, inclusiv tabla de joc. Am considerat tabla de joc ca fiind o lista Haskell in care primele 6 elemente reprezinta casele mele, iar urmatoarele 6 ale adversarului.
+		Se vor implementa diverse functii precum :
+
+			* show : se instantiaza cu tipul Board si afiseaza casele / scorului jucatorilor, dar si cine este la rand in urmatorul format:
+							4  4  4  4  4  4
+				          0                  0    Next: You, Playing, Score: (0,0)
+				            4  4  4  4  4  4 
+
+			* yourSeeds : starea jocului pentru utilizatorul curent
+
+			* oppsSeeds : starea jocului pentru oponent
+
+			* initialBoard : configuratia initiala a tablei de joc
+
+			* move : functia cea mai complexa, care tine cont de regulile jocului. Utilizatorii vor muta semintele circular si la fiecare samanta ajunsa in depozit scorul va creste si nu se va schimba randul la joc. In cazul in care samanta va pica in orice alt loc (pe tabla jucatorului curent sau pe tabla adversarului se va schimba jucatorul la rand). O alta regula importanta care mareste scorul jucatorului este captura : in cazul in care ultima samanta este pe o casuta goala de a jucatorului iar celalalt jucatorul are seminte in casuta sa corespunzatoare jucatorul la rand va pune in depozitiv semintele din ambele casute.
+				Implementarea acestei functii considera doua functii ajutatoare care descriu modul in care are loc plasarea pentru cei jucatori avand in vedere mutarea circulara in sens trigonometric. Pentru ca nu exista efecte laterale si posibilitatea de a modifica un anumit element in lista, plasarea elementelor presupune crearea de fiecare data a unei liste noi. Atfel , pentru a a plasa o samanta in casuta house = 3 concatenez lista primele 3 elemente din lista cu elementul incrementat si restul listei -> avand in vedere si faptul ca in Haskell listele incep de la 0.
+
+			* score : in cazul in care jocul nu s-a incheiat returnez o pereche formata din scorul jucatorului curent si scorul oponentului. In caz contrar , la acest scor se adauga si semintele ramase pe tabla dupa inchiderea jocului. Castiga cel cu numar mai mare de seminte adunate.
+
+			*successors : intoarce perechile casa - configuratie, reprezentand mutarile care ar putea fi executate pentru actuala configuratie a tablei de joc.
+
+	O implementarea simpla a strategiei de joc ar putea fi un design de tip Greedy. Astfel, din mutarile care ar putea fi executate pentru actuala configuratia s-ar putea alege cea cu scor mai mare :
+
+	step :: Board -> (House, Board)
+	step board = let possibleMoves = successors board;
+					maxValues = map (\pair -> snd (scores (snd pair))) possibleMoves;
+					max = maximum maxValues
+			in head $ filter (\pair -> (snd (scores (snd pair))) == max) possibleMoves
